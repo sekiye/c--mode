@@ -1,0 +1,50 @@
+# -*- mode: snippet -*-
+# name: unionfind
+# key: unionfind
+# --
+const int MAX_N = 100001;
+
+namespace uf {
+  int par[MAX_N];
+  int rank[MAX_N];
+  int count[MAX_N];
+}
+
+void init(int n) {
+  for (int i = 0; i < n; i++) {
+    uf::par[i] = i;
+    uf::rank[i] = 0;
+    uf::count[i] = 1;
+  }
+}
+
+int find(int x) {
+  if (uf::par[x] == x) {
+    return x;
+  } else {
+    return uf::par[x] = find(uf::par[x]);
+  }
+}
+
+void unite(int x, int y) {
+  x = find(x);
+  y = find(y);
+  if (x == y)
+    return;
+
+  if (uf::rank[x] < uf::rank[y]) {
+    uf::par[x] = y;
+    uf::count[y] += uf::count[x];
+  } else {
+    uf::par[y] = x;
+    if (uf::rank[x] == uf::rank[y])
+      uf::rank[x]++;
+    uf::count[x] += uf::count[y];
+  }
+}
+
+int group_size(int x) {
+  return uf::count[find(x)];
+}
+
+bool same(int x, int y) { return find(x) == find(y); }

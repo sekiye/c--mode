@@ -1,0 +1,43 @@
+# -*- mode: snippet -*-
+# name: garner
+# key: garner (chinese remainder theorem)
+# --
+// a,b の最大公約数と、ax + by = gcd(a,b) となる x,y を求める
+ll extgcd(ll a, ll b, ll &x, ll &y) {
+ll g = a;
+if (b != 0) {
+g = extgcd(b, a % b, y, x);
+y -= (a / b) * x;
+} else {
+x = 1;
+y = 0;
+}
+return g;
+}
+
+// 負の数にも対応した mod
+inline ll mod(ll x, ll m) { return (x % m + m) % m; }
+
+// ax ≡ gcd(a, m) (mod m) となる x を求める
+// a, m が互いに素ならば、関数値は mod m での a の逆数となる
+ll mod_inverse(ll a, ll m) {
+ll x, y;
+extgcd(a, m, x, y);
+return mod(x, m);
+}
+
+// Garner のアルゴリズム, x%MOD, LCM%MOD を求める (m
+// は互いに素でなければならない) O(log |K|^2) K = b.size()
+ll garner(vector<ll> b, vector<ll> m, ll MOD) {
+m.push_back(MOD); // banpei
+vector<ll> coeffs((int)m.size(), 1);
+vector<ll> constants((int)m.size(), 0);
+for (int k = 0; k < (int)b.size(); ++k) {
+ll t = mod((b[k] - constants[k]) * mod_inverse(coeffs[k], m[k]), m[k]);
+for (int i = k + 1; i < (int)m.size(); ++i) {
+(constants[i] += t * coeffs[i]) %= m[i];
+(coeffs[i] *= m[k]) %= m[i];
+}
+}
+return constants.back();
+}

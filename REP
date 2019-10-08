@@ -1,0 +1,8 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: REP
+# key: REP
+# binding: direct-keybinding
+# --
+REP(${1:i}, ${2:N}) {
+  $0
+}

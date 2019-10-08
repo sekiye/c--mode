@@ -1,0 +1,44 @@
+# -*- mode: snippet -*-
+# name: topological_sort
+# key: topological_sort
+# --
+// トポロジカルソート　O(log |V|+|E|)
+typedef ll Node; // Node番号
+
+class TopologicalSort {
+public:
+explicit TopologicalSort(ll size) : graph(size), indegree(size) {}
+
+void AddEdge(Node from, Node to) {
+graph[from].push_back(Edge{to});
+indegree[to]++;
+}
+
+vector<Node> Sort() {
+queue<Node> st; //入次数が0の頂点の集合
+REP(i, graph.size()) {
+if (indegree[i] == 0) {
+st.push(i);
+}
+}
+vector<Node> ans;
+while (st.size()) {
+Node i = st.front();
+st.pop();
+ans.push_back(i);
+for (const auto &j : graph[i]) {
+indegree[j.to]--;
+if (indegree[j.to] == 0)
+st.push(j.to);
+}
+}
+return ans;
+}
+
+private:
+struct Edge {
+Node to;
+};
+vector<vector<Edge>> graph;
+vector<ll> indegree;
+};

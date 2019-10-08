@@ -1,0 +1,64 @@
+# -*- mode: snippet -*-
+# name: bellman_ford
+# key: bellman_ford
+# --
+static const ll INF = std::numeric_limits<ll>::max() / 3;
+static const ll MAX_E = 2000; // TODO
+static const ll MAX_V = 1000; // TODO
+
+struct Edge {
+  ll from;
+  ll to;
+  ll cost; // TODO
+};
+
+Edge es[MAX_E];
+
+ll d[MAX_V];
+ll V; // TODO
+ll E; // TODO
+
+// s番目の頂点から各頂点への最短距離を求める O(|V| * |E|)
+// s番目の頂点からのパスに負の閉路が存在する場合、falseを返す
+bool bellman_ford(ll s) {
+  for (ll i = 0; i < V; i++) {
+    d[i] = INF;
+  }
+  d[s] = 0;
+  for (int i = 0; i < V; i++) {
+    bool update = false;
+    for (ll j = 0; j < E; j++) {
+      Edge e = es[j];
+      if (d[e.from] != INF && d[e.to] > d[e.from] + e.cost) {
+        d[e.to] = d[e.from] + e.cost;
+        if (i == V - 1) {
+          return false;
+        }
+        update = true;
+      }
+    }
+    if (!update) {
+      break;
+    }
+  }
+  return true;
+}
+
+// trueなら負の閉路が存在する
+bool find_negative_loop() {
+  memset(d, 0, sizeof(d));
+
+  for (int i = 0; i < V; i++) {
+    for (int j = 0; j < E; j++) {
+      Edge e = es[j];
+      if (d[e.to] > d[e.from] + e.cost) {
+        d[e.to] = d[e.from] + e.cost;
+
+        if (i == V - 1) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}

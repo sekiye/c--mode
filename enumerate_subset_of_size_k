@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: enumerate_subset_of_size_k
+# key: enumerate_subset_of_size_k
+# --
+  // (0, 1, ..., n - 1)に含まれるサイズkの部分集合列挙
+  int n;
+  int k;
+  int comb = (1 << k) - 1;
+  while (comb < 1 << n) {
+    // 部分集合に対する処理
+    int x = comb & -comb;
+    int y = comb + x;
+    comb = ((comb & ~y) / x >> 1) | y;
+  }

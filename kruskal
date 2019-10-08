@@ -1,0 +1,75 @@
+# -*- mode: snippet -*-
+# name: kruskal
+# key: kruskal
+# --
+// クラスカル法、最小全域木を求める O(|E| log |V|)
+// 辺をコストの小さい順に見ていき、閉路ができなければ追加
+namespace uf {
+vector<ll> par;
+vector<ll> rank;
+vector<ll> count;
+} // namespace uf
+
+void init(ll n) {
+  uf::par.resize(n);
+  uf::rank.resize(n);
+  uf::count.resize(n);
+  for (ll i = 0; i < n; i++) {
+    uf::par[i] = i;
+    uf::rank[i] = 0;
+    uf::count[i] = 1;
+  }
+}
+
+ll find(ll x) {
+  if (uf::par[x] == x) {
+    return x;
+  } else {
+    return uf::par[x] = find(uf::par[x]);
+  }
+}
+
+void unite(ll x, ll y) {
+  x = find(x);
+  y = find(y);
+  if (x == y)
+    return;
+
+  if (uf::rank[x] < uf::rank[y]) {
+    uf::par[x] = y;
+    uf::count[y] += uf::count[x];
+  } else {
+    uf::par[y] = x;
+    if (uf::rank[x] == uf::rank[y])
+      uf::rank[x]++;
+    uf::count[x] += uf::count[y];
+  }
+}
+
+ll group_size(ll x) { return uf::count[find(x)]; }
+
+bool same(ll x, ll y) { return find(x) == find(y); }
+
+struct Edge {
+  ll u;
+  ll v;
+  ll cost;
+};
+
+bool comp(const Edge &e1, const Edge &e2) { return e1.cost < e2.cost; }
+
+ll V; // TODO
+
+ll kruskal(vector<Edge> es) {
+  sort(es.begin(), es.end(), comp);
+  init(V);
+  ll res = 0;
+  for (ll i = 0; i < (ll)es.size(); i++) {
+    Edge e = es[i];
+    if (!same(e.u, e.v)) {
+      unite(e.u, e.v);
+      res += e.cost;
+    }
+  }
+  return res;
+}

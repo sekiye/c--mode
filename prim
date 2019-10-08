@@ -1,0 +1,40 @@
+# -*- mode: snippet -*-
+# name: prim
+# key: prim
+# --
+// プリム法、最小全域木を求める O(|E| log V)
+// ある頂点から始めて、少しずつ辺を追加していく
+static const ll INF = std::numeric_limits<ll>::max() / 3;
+static const ll MAX_V = 100; // TODO あまり大きいと使えない
+
+ll cost[MAX_V][MAX_V]; // TODO
+bool used[MAX_V];
+ll V; // TODO
+
+// second: 頂点の番号
+// first: 集合Xからの頂点への最小コスト
+typedef pair<ll, ll> Node;
+
+ll prim() {
+  for (int i = 0; i < V; i++) {
+    used[i] = false;
+  }
+  priority_queue<Node, vector<Node>, greater<Node>> q;
+  q.push(Node{0, 0});
+  ll res = 0;
+  while (!q.empty()) {
+    Node node = q.top();
+    q.pop();
+    if (used[node.second]) {
+      continue;
+    }
+    used[node.second] = true;
+    res += node.first;
+    for (ll u = 0; u < V; u++) {
+      if (cost[node.second][u] != INF) {
+        q.push(Node{cost[node.second][u], u});
+      }
+    }
+  }
+  return res;
+}
