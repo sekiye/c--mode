@@ -4,24 +4,35 @@
 # --
 // 範囲の大きなRange Minimum Query
 // 値の挿入・ある場所の値の更新・ある区間の最小・最大・合計 O(log n)
-template <typename T> class Treap {
+template <typename T>
+class Treap {
  public:
   Treap() : root_(nullptr) {}
-  void Insert(int k, T v) { root_ = Insert(root_, k, v, rand()); }
-  void Update(int k, T v) {
+  void Insert(ll k, T v) {
+    root_ = Insert(root_, k, v, rand());
+  }
+  void Update(ll k, T v) {
     root_ = Erase(root_, k);
     root_ = Insert(root_, k, v, rand());
   }
-  void Shift(int l, int r) { root_ = Shift(root_, l, r + 1); }
-  T Min(int l, int r) { return Min(root_, l, r + 1); }
-  T Max(int l, int r) { return Max(root_, l, r + 1); }
-  T Sum(int l, int r) { return Sum(root_, l, r + 1); }
+  void Shift(ll l, ll r) {
+    root_ = Shift(root_, l, r + 1);
+  }
+  T Min(ll l, ll r) {
+    return Min(root_, l, r + 1);
+  }
+  T Max(ll l, ll r) {
+    return Max(root_, l, r + 1);
+  }
+  T Sum(ll l, ll r) {
+    return Sum(root_, l, r + 1);
+  }
 
  private:
-  static const T kInf = 10000001; // TODO
+  static const T kInf = 1000000001;
 
   struct Node {
-    Node(int v, double p) : val(v), pri(p), cnt(1), sum(v), min(v), max(v) {
+    Node(ll v, double p) : val(v), pri(p), cnt(1), sum(v), min(v), max(v) {
       lch = nullptr;
       rch = nullptr;
     }
@@ -29,16 +40,24 @@ template <typename T> class Treap {
     Node *lch;
     Node *rch;
     double pri;
-    int cnt;
+    ll cnt;
     T sum;
     T min;
     T max;
   };
 
-  int Count(Node *t) { return !t ? 0 : t->cnt; }
-  int Sum(Node *t) { return !t ? 0 : t->sum; }
-  int Min(Node *t) { return !t ? kInf : t->min; }
-  int Max(Node *t) { return !t ? -kInf : t->max; }
+  ll Count(Node *t) {
+    return !t ? 0 : t->cnt;
+  }
+  ll Sum(Node *t) {
+    return !t ? 0 : t->sum;
+  }
+  ll Min(Node *t) {
+    return !t ? kInf : t->min;
+  }
+  ll Max(Node *t) {
+    return !t ? -kInf : t->max;
+  }
   Node *Update(Node *t) {
     t->cnt = Count(t->lch) + Count(t->rch) + 1;
     t->sum = Sum(t->lch) + Sum(t->rch) + t->val;
@@ -61,7 +80,7 @@ template <typename T> class Treap {
       return Update(r);
     }
   }
-  pair<Node *, Node *> Split(Node *t, int k) { // [0, k), [k, n)
+  pair<Node *, Node *> Split(Node *t, ll k) {  // [0, k), [k, n)
     if (!t)
       return make_pair(nullptr, nullptr);
 
@@ -75,50 +94,65 @@ template <typename T> class Treap {
       return make_pair(Update(t), s.second);
     }
   }
-  Node *Insert(Node *t, int k, int val, double pri) {
+  Node *Insert(Node *t, ll k, ll val, double pri) {
     auto s = Split(t, k);
     Node *n = new Node(val, pri);
     return Merge(Merge(s.first, n), s.second);
   }
-  Node *Erase(Node *t, int k) {
+  Node *Erase(Node *t, ll k) {
     auto s = Split(t, k);
     auto u = Split(s.second, 1);
     delete u.first;
     return Merge(s.first, u.second);
   }
-  Node *Shift(Node *t, int l, int r) {
+  Node *Shift(Node *t, ll l, ll r) {
     auto c = Split(t, r);
     auto b = Split(c.first, r - 1);
     auto a = Split(b.first, l);
     return Merge(Merge(a.first, b.second), Merge(a.second, c.second));
   }
-  int Min(Node *t, int l, int r) {
+  ll Min(Node *t, ll l, ll r) {
     if (!t)
       return kInf;
     if (l <= 0 && Count(t) <= r)
       return Min(t);
     if (r <= 0 || Count(t) <= l)
       return kInf;
-    int l_min = Min(t->lch, l, r);
-    int r_min = Min(t->rch, l - Count(t->lch) - 1, r - Count(t->lch) - 1);
-    int ans = min(l_min, r_min);
+    ll l_min = Min(t->lch, l, r);
+    ll r_min = Min(t->rch, l - Count(t->lch) - 1, r - Count(t->lch) - 1);
+    ll ans = min(l_min, r_min);
     if (l <= Count(t->lch) && Count(t->lch) < r) {
       ans = min(ans, t->val);
     }
     return ans;
   }
-  int Max(Node *t, int l, int r) {
+  ll Max(Node *t, ll l, ll r) {
     if (!t)
       return -kInf;
     if (l <= 0 && Count(t) <= r)
       return Max(t);
     if (r <= 0 || Count(t) <= l)
       return -kInf;
-    int l_max = Max(t->lch, l, r);
-    int r_max = Max(t->rch, l - Count(t->lch) - 1, r - Count(t->lch) - 1);
-    int ans = max(l_max, r_max);
+    ll l_max = Max(t->lch, l, r);
+    ll r_max = Max(t->rch, l - Count(t->lch) - 1, r - Count(t->lch) - 1);
+    ll ans = max(l_max, r_max);
     if (l <= Count(t->lch) && Count(t->lch) < r) {
       ans = max(ans, t->val);
+    }
+    return ans;
+  }
+  ll Sum(Node *t, ll l, ll r) {
+    if (!t)
+      return 0;
+    if (l <= 0 && Count(t) <= r)
+      return Sum(t);
+    if (r <= 0 || Count(t) <= l)
+      return 0;
+    ll l_max = Sum(t->lch, l, r);
+    ll r_max = Sum(t->rch, l - Count(t->lch) - 1, r - Count(t->lch) - 1);
+    ll ans = l_max + r_max;
+    if (l <= Count(t->lch) && Count(t->lch) < r) {
+      ans = ans + t->val;
     }
     return ans;
   }
